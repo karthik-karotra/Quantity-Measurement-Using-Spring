@@ -1,6 +1,7 @@
 package com.bridgelabz.quantitymeasurementspringapi.mockito;
 
 import com.bridgelabz.quantitymeasurementspringapi.dto.ConvertDTO;
+import com.bridgelabz.quantitymeasurementspringapi.dto.ResponseDto;
 import com.bridgelabz.quantitymeasurementspringapi.enumerations.Quantities;
 import com.bridgelabz.quantitymeasurementspringapi.enumerations.SubQuantities;
 import com.bridgelabz.quantitymeasurementspringapi.services.implementors.QuantityMeasurementService;
@@ -17,9 +18,11 @@ import static com.bridgelabz.quantitymeasurementspringapi.enumerations.Quantitie
 import static com.bridgelabz.quantitymeasurementspringapi.enumerations.SubQuantities.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
 public class QuantityMeasurementControllerTest {
@@ -47,14 +50,33 @@ public class QuantityMeasurementControllerTest {
     }
 
     @Test
-    public void whenGivenBaseAndTargetUnitTypeAlongWithTheBaseUnitValue_ShouldReturnConvertedValue() throws Exception {
+    public void whenGivenBaseAndTargetUnitTypeAlongWithTheBaseUnitValueOtherThanTemperature_ShouldReturnConvertedValue() throws Exception {
+        Gson gson = new Gson();
         ConvertDTO convertDTO = new ConvertDTO(1.0, FEET, INCH);
-        String json = new Gson().toJson(convertDTO);
-        given(quantityMeasurementService.getConvertedValueOfUnit(any())).willReturn(12.0);
-        mockMvc.perform(
-                post("/units/convert")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE).content(json))
-                .andExpect(content().json(String.valueOf(12.0)));
+        String jsonConvertDTO = gson.toJson(convertDTO);
+        ResponseDto responseDto = new ResponseDto(12, "Response Successful", 200);
+        String jsonResponseDTO = gson.toJson(responseDto);
+        when(quantityMeasurementService.getConvertedValueOfUnit(any())).thenReturn(12.0);
+        mockMvc.perform(post("/units/convert")
+                .content(jsonConvertDTO)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(jsonResponseDTO));
+    }
+
+    @Test
+    public void whenGivenBaseAndTargetUnitTypeAlongWithTheBaseUnitValueOfTemperature_ShouldReturnConvertedValue() throws Exception {
+        Gson gson = new Gson();
+        ConvertDTO convertDTO = new ConvertDTO(202.0, FAHRENHEIT, CELSIUS);
+        String jsonConvertDTO = gson.toJson(convertDTO);
+        ResponseDto responseDto = new ResponseDto(100, "Response Successful", 200);
+        String jsonResponseDTO = gson.toJson(responseDto);
+        when(quantityMeasurementService.getConvertedValueOfUnit(any())).thenReturn(100.0);
+        mockMvc.perform(post("/units/convert")
+                .content(jsonConvertDTO)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(jsonResponseDTO));
     }
 }
 

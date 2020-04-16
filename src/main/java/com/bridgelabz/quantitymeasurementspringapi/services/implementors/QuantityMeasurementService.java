@@ -26,6 +26,15 @@ public class QuantityMeasurementService implements IQuantityMeasurementService {
 
     @Override
     public Double getConvertedValueOfUnit(ConvertDTO convertDTO) {
-        return convertDTO.valueOfInitialUnit * convertDTO.baseUnit.conversionFactor / convertDTO.targetUnit.conversionFactor;
+        if (convertDTO.baseUnit.mainQuantityType.equals(Quantities.TEMPERATURE)) {
+            return conversionForTemperatureUnits(convertDTO);
+        }
+        return (convertDTO.valueOfInitialUnit * convertDTO.baseUnit.conversionFactor) / convertDTO.targetUnit.conversionFactor;
+    }
+
+    public Double conversionForTemperatureUnits(ConvertDTO convertDTO) {
+        if (convertDTO.baseUnit == SubQuantities.CELSIUS && convertDTO.targetUnit == SubQuantities.FAHRENHEIT)
+            return (convertDTO.valueOfInitialUnit * convertDTO.baseUnit.conversionFactor) + 32;
+        return (convertDTO.valueOfInitialUnit - 32) * convertDTO.baseUnit.conversionFactor;
     }
 }
