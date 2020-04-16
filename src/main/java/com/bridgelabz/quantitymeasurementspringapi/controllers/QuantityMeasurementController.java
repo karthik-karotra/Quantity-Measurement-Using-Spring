@@ -1,12 +1,12 @@
 package com.bridgelabz.quantitymeasurementspringapi.controllers;
 
+import com.bridgelabz.quantitymeasurementspringapi.dto.ConvertDTO;
 import com.bridgelabz.quantitymeasurementspringapi.enumerations.Quantities;
 import com.bridgelabz.quantitymeasurementspringapi.enumerations.SubQuantities;
 import com.bridgelabz.quantitymeasurementspringapi.services.IQuantityMeasurementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -24,4 +24,9 @@ public class QuantityMeasurementController {
     public List<SubQuantities> getAllSubQuantities(@RequestParam(value = "unit") Quantities unit) {
         return quantityMeasurementService.getAllSubUnits(unit);
     }
+
+   @PostMapping("/units/convert")
+    public Double convert(@RequestBody ConvertDTO convertDTO) {
+       return quantityMeasurementService.getConvertedValueOfUnit(convertDTO);
+   }
 }
